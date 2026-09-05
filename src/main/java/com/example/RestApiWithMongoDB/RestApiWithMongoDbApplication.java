@@ -43,11 +43,22 @@ public class RestApiWithMongoDbApplication {
 			);
 
 			Query query = new Query();
-			query.addCriteria(Criteria.where("email").is(email));
+            String email = "email";
+            query.addCriteria(Criteria.where("email").is(email));
 
-			mongoTemplate.find(query, Student.class);
+			List<Student> students = mongoTemplate.find(query, Student.class);
 
-			repository.insert(student);
+			if (students.size() > 1) {
+				throw new IllegalStateException("found many students with email " + email);
+			}
+
+			if (students.isEmpty()) {
+				System.out.println("Inserting student " + student);
+				repository.insert(student);
+			} else {
+				System.out.println(student + " Already exists");
+			}
+
 		};
 	}
 
